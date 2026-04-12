@@ -1,5 +1,5 @@
-from uthSimulation import checkOdds
-from dead_card import create_unified_dead_cards_fn
+from uthCollusion.preFlopWinProbs.uthSimulation import checkOdds
+from uthCollusion.preFlopWinProbs.dead_card import create_unified_dead_cards_fn
 
 
 def find_lowest_winning_hand(start_high_card='J', start_low_card='9', num_higher_cards=None, num_simulations=5000):

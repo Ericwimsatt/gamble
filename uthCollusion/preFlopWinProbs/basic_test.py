@@ -1,4 +1,4 @@
-from uthSimulation import checkOdds
+from uthCollusion.preFlopWinProbs.uthSimulation import checkOdds
 
 
 def run_basic_tests():

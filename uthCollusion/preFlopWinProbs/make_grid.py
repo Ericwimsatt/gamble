@@ -2,7 +2,7 @@ import threading
 import concurrent.futures
 import time
 from typing import List, Optional, Dict, Callable
-from dead_card import (
+from uthCollusion.preFlopWinProbs.dead_card import (
     find_lowest_winning_hand,
     create_unified_dead_cards_fn,
     RANKS,
