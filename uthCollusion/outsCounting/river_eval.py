@@ -32,25 +32,75 @@ def get_remaining_cards(player_cards: list[int], shared_cards: list[int]) -> set
     used_cards = set(player_cards) | set(shared_cards)
     return full_deck - used_cards
 
-def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: list[int]) -> list[int]:
-    counts = count_pair_and_high_card_categories(player_cards, shared_cards)
+def max_super(a,b):
+    if a>b:
+        return a,0
+    if b>a:
+        return b,1
+    return a,0
+
+def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: list[int]) -> list[tuple[int, int]]:
+
     outs = []
     
-    # Add overcards
-    if counts["overCardCount"] > 0:
-        outs.extend([c for c in range(2, 15) if c > max(player_cards)])
+    counts = count_pair_and_high_card_categories(player_cards, shared_cards)
+    player_ranks = sorted([treys.Card.get_rank_int(c) for c in player_cards], reverse=True)
+    shared_ranks = sorted([treys.Card.get_rank_int(c) for c in shared_cards], reverse=True)
+    player_high_rank, player_low_rank = player_ranks
+    if player_high_rank == player_low_rank:
+        counts["highPairCount"] += 1
+    remaining_cards = get_remaining_cards(player_cards, shared_cards)
+    maxCount, maxIndex = max_super(counts["highPairCount"], counts["lowPairCount"])
+    totalPairs = counts["highPairCount"] + counts["lowPairCount"]
+    maxPairValue = player_ranks[maxIndex]
+
+    if totalPairs == 1:
+        dealer_board_pairs = {
+            "higherPair":[],
+            "samePair":[],
+            "lowerPair":[]
+        }
+
+        for card in remaining_cards:
+            rank = treys.Card.get_rank_int(card)
+            if rank in shared_ranks:
+            #TODO: trips is also a higher pair
+                if rank > maxPairValue:
+                    dealer_board_pairs["higherPair"].append(card)
+                elif rank == maxPairValue:
+                    dealer_board_pairs["samePair"].append(card)
+                elif rank < maxPairValue:
+                    dealer_board_pairs["lowerPair"].append(card)
+        
+        for higher_pair_card in dealer_board_pairs["higherPair"]:
+            remaining_cards.remove(higher_pair_card)
+            for card in remaining_cards:
+                outs.append((higher_pair_card, card))
+
+        for same_pair_card in dealer_board_pairs["samePair"]:
+            remaining_cards.remove(same_pair_card)
+            for card in remaining_cards:
+                if treys.Card.get_rank_int(card) == treys.Card.get_rank_int(same_pair_card):
+                    outs.append((same_pair_card, card))
+                    continue
+                elif treys.Card.get_rank_int(card) > player_low_rank:
+                    outs.append((same_pair_card, card))
+
+        
     
-    # Add high pair outs
-    if counts["highPairCount"] > 0:
-        outs.append(max(player_cards))
-    
-    # Add between cards
-    if counts["betweenCount"] > 0:
-        low_rank, high_rank = sorted([treys.Card.get_rank_int(c) for c in player_cards])
-        outs.extend([c for c in range(low_rank + 1, high_rank)])
-    
-    # Add low pair outs
-    if counts["lowPairCount"] > 0:
-        outs.append(min(player_cards))
     
     return sorted(set(outs))
+
+if __name__ == "__main__":
+    player_cards = [treys.Card.new("Ah"), treys.Card.new("Kh")]
+    shared_cards = [treys.Card.new("As"), treys.Card.new("Js"), treys.Card.new("Jc"), treys.Card.new("6c"), treys.Card.new("2s")]
+    result = enumerate_pair_and_high_card_outs(player_cards, shared_cards)
+    #This should include every tuple of a dealer's hand that would beat the player.
+    assert (treys.Card.new("Ac"), treys.Card.new("Jd")) in result
+    assert (treys.Card.new("Ah"), treys.Card.new("Ts")) in result
+    remaining_cards = get_remaining_cards(player_cards, shared_cards)
+    assert len(remaining_cards) == 45
+    for card in remaining_cards:
+        if card is not treys.Card.new("Jd"):
+            assert (treys.Card.new("Jd"), card) in result
+    assert len(result) == 94
