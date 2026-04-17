@@ -64,7 +64,7 @@ def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: lis
         for card in remaining_cards:
             rank = treys.Card.get_rank_int(card)
             if rank in shared_ranks:
-            #TODO: trips is also a higher pair
+            #TODO: trips is also a higher pair because we're only looking when player has 1 pair
                 if rank > maxPairValue:
                     dealer_board_pairs["higherPair"].append(card)
                 elif rank == maxPairValue:
