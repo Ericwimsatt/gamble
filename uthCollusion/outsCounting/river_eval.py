@@ -80,15 +80,30 @@ def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: lis
         for same_pair_card in dealer_board_pairs["samePair"]:
             remaining_cards.remove(same_pair_card)
             for card in remaining_cards:
+                #trips
                 if treys.Card.get_rank_int(card) == treys.Card.get_rank_int(same_pair_card):
                     outs.append((same_pair_card, card))
                     continue
+                #2 pair
+                elif card in dealer_board_pairs["lowerPair"]:
+                    outs.append((same_pair_card, card))
                 elif treys.Card.get_rank_int(card) > player_low_rank:
                     outs.append((same_pair_card, card))
 
-        
+        for lower_pair_card in dealer_board_pairs["lowerPair"]:
+            remaining_cards.remove(lower_pair_card)
+            for card in remaining_cards:
+                 #trips
+                if treys.Card.get_rank_int(card) == treys.Card.get_rank_int(same_pair_card):
+                    outs.append((same_pair_card, card))
+                    continue
+                #2 pair
+                if card in dealer_board_pairs["lowerPair"]:
+                    outs.append((lower_pair_card, card))
     
-    
+    print("OUTS")
+    for hand in outs:
+        print(f"{treys.Card.int_to_pretty_str(hand[0])}, {treys.Card.int_to_pretty_str(hand[1])}")
     return sorted(set(outs))
 
 if __name__ == "__main__":
