@@ -36,6 +36,11 @@ Shared cards that are a spade or club will always evaluate the same way
 
 Use probability math/outs counting where possible instead of simulations
 
+## River idea:
+for river:
+For each player hand possibliity (flush, straight, 2 pair, pair, high card, etc), count dealer outs. This should be easy to modify if there's known dead cards
+To do a round earlier, consider number of cards to put player at each hand strength, and then dealers possibilities. Or know win percentage at each outcome.
+
 ## Workflow
 Preflop: max(EV 4x, EV (PostFlop))
 
