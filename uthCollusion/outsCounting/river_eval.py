@@ -54,6 +54,8 @@ def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: lis
     totalPairs = counts["highPairCount"] + counts["lowPairCount"]
     maxPairValue = player_ranks[maxIndex]
 
+    # if royal_flush->full house->quads->flush->straight->trips->two pair->pair->high card
+    # eval dealer hand against each player hand.
     if totalPairs == 1:
         dealer_board_pairs = {
             "higherPair":[],
