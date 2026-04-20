@@ -56,6 +56,7 @@ def enumerate_pair_and_high_card_outs(player_cards: list[int], shared_cards: lis
 
     # if royal_flush->full house->quads->flush->straight->trips->two pair->pair->high card
     # eval dealer hand against each player hand.
+    #DKLMKL
     if totalPairs == 1:
         dealer_board_pairs = {
             "higherPair":[],
