@@ -3,7 +3,13 @@ Generating win probabilities based on known dead cards
 
 -didn't work because optimal strategy is affected by the ability to make other adjustments later
 
-## Strategy-Checking Cases
+## Strategy Testing
+
+Create a sim of the game, test strategies one at a time. See which ones perform better.
+
+
+
+## Maximizing Duplicate Hands
 
 Want to be able to factor in dead cards to an optimal strategy
 
