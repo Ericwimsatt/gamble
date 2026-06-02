@@ -8,6 +8,12 @@ Generating win probabilities based on known dead cards
 Create a sim of the game, test strategies one at a time. See which ones perform better.
 
 ### Strategy definition
+Circumstance:
+Hand is [player_high, player_low]
+Dead cards []
+
+### Simplifying Rules
+player_high is a heart
 
 ## Maximizing Duplicate Hands
 
