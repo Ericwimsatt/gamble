@@ -80,7 +80,7 @@ def base_river(player_hand, board, dead_cards):
     return False
 
 #Dead-Card-Dependent
-def pass_if_pair(player_hand, dead_cards):
+def pass_if_dead_pair(player_hand, dead_cards):
         if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
             return False
         if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
@@ -93,8 +93,8 @@ def pass_if_pair(player_hand, dead_cards):
             return True
         
 
-def pass_if_pair_unless_ace(player_hand, dead_cards):
-        if Card.get_rank_int(player_hand[0]) >= 12:
+def pass_if_dead_pair_unless_ace_queen(player_hand, dead_cards):
+        if Card.get_rank_int(player_hand[0]) >= 12 and Card.get_rank_int(player_hand[1]) >= 10:
             return True
         if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
             return False
@@ -105,6 +105,21 @@ def pass_if_pair_unless_ace(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
             return True
         
+
+def pass_if_dead_pair_unless_pocket_pair(player_hand, dead_cards):
+        hand_rank = eval_even_if_unfull(player_hand, [])
+        if hand_rank <= 5955: # pair of 3s or better
+            return True
+        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
 
 
 #Dead-Card Makers

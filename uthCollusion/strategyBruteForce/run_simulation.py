@@ -20,7 +20,6 @@ def blind_payout(player_rank):
 def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker):
     deck = Deck()
     player_hand = deck.draw(2)
-    Card.print_pretty_cards(player_hand)
     board = []
     dead_cards = deck.pull_many(dead_card_maker(player_hand))
 
@@ -45,12 +44,17 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
     dealer_rank = evaluation.evaluate(dealer_hand, board)
     player_rank = evaluation.evaluate(player_hand, board)
 
+    # print("Evaling hand")
+    # Card.print_pretty_cards(player_hand)
+    # Card.print_pretty_cards(board)
+    # Card.print_pretty_cards(dealer_hand)
+    # evaluation.hand_summary(board, [player_hand, dealer_hand])
     if player_rank == dealer_rank:
         return 0
     
     # Check if dealer qualifies
-    # 2860 is max rank for a pair
-    if dealer_rank < 2860:
+    # 6185 is max rank for a pair
+    if dealer_rank < 6185:
         bet_total = bet_total + 1
 
     if player_rank < dealer_rank:
@@ -60,22 +64,25 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
 
 
 def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=lambda hand: [], hands=1000):
-
     total = 0
     for _ in range(hands):
         result = play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker)
         total += result
-        print(result)
     print("Average result: {}".format(total / hands))
     return total / hands
 
 if __name__ == "__main__":
+    base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=1000000)
     base = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], 
-                   dead_card_maker=dead_cards_matching_player_high(1))
-    change = run_simulation(pass_if_pair, base_strategies['post_flop'], base_strategies['river'], 
-                   dead_card_maker=dead_cards_matching_player_high(1))
-    change_ace = run_simulation(pass_if_pair_unless_ace, base_strategies['post_flop'], base_strategies['river'], 
-                   dead_card_maker=dead_cards_matching_player_high(1))
-print("Base strategy average: {}".format(base))
-print("Change strategy average: {}".format(change))
-print("Change ace strategy average: {}".format(change_ace))
+                   dead_card_maker=dead_cards_matching_player_high(1), hands=100000)
+    change = run_simulation(pass_if_dead_pair, base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1), hands=100000)
+    change_ace = run_simulation(pass_if_dead_pair_unless_ace_queen, base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1), hands =100000)
+    change_pair = run_simulation(pass_if_dead_pair_unless_pocket_pair, base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1), hands=100000)
+    print("Base no deads: {}".format(base_no_deads))
+    print("Base-always dead card pair: {}".format(base))
+    print("Change strat -always dead card pair: {}".format(change))
+    print("Change unless ace queen -always dead card pair:: {}".format(change_ace))
+    print("Change unless pocket pair -always dead card pair:: {}".format(change_pair))
