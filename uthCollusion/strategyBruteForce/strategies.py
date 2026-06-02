@@ -78,8 +78,7 @@ def base_post_flop(player_hand, board, dead_cards):
     return False
 
 def base_river(player_hand, board, dead_cards):
-    hand_rank = evaluation.evaluate(player_hand, board)
-    if hand_rank <= 6185: # pair of 2s or better
+    if count_outs(player_hand, board, dead_cards) < 22: # if we have 2 or more outs to improve our hand, call
         return True
     return False
 
