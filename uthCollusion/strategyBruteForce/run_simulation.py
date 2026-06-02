@@ -20,6 +20,7 @@ def blind_payout(player_rank):
 def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker):
     deck = Deck()
     player_hand = deck.draw(2)
+    Card.print_pretty_cards(player_hand)
     board = []
     dead_cards = deck.pull_many(dead_card_maker(player_hand))
 
@@ -66,6 +67,15 @@ def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_c
         total += result
         print(result)
     print("Average result: {}".format(total / hands))
+    return total / hands
 
 if __name__ == "__main__":
-    run_simulation(base_pre_flop, base_post_flop, base_river)
+    base = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1))
+    change = run_simulation(pass_if_pair, base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1))
+    change_ace = run_simulation(pass_if_pair_unless_ace, base_strategies['post_flop'], base_strategies['river'], 
+                   dead_card_maker=dead_cards_matching_player_high(1))
+print("Base strategy average: {}".format(base))
+print("Change strategy average: {}".format(change))
+print("Change ace strategy average: {}".format(change_ace))

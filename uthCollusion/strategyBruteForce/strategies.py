@@ -1,4 +1,5 @@
 from treys import Card, evaluation, Deck
+from random import random
 
 #### UTILITIES ###
 def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> list[int]:
@@ -11,11 +12,7 @@ def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> list[int]:
         extras = []
         ranks = sorted([Card.get_rank_int(card) for card in all_cards])
         # Check 1 card so we don't accidentally make a straight
-        suit_barred = Card.get_suit_int(all_cards[0])
-        if suit_barred == 1:
-            new_suit = 2
-        else:
-            new_suit = 1
+        new_suit = Card.next_suit(all_cards[0])
 
         # if highest card is less than 5 there's a risk we make a straight, so add a 6 to prevent
         if ranks[-1] < 4:
@@ -82,6 +79,54 @@ def base_river(player_hand, board, dead_cards):
         return True
     return False
 
+#Dead-Card-Dependent
+def pass_if_pair(player_hand, dead_cards):
+        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
+        
+
+def pass_if_pair_unless_ace(player_hand, dead_cards):
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
+        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        
+
+
+#Dead-Card Makers
+def dead_cards_matching_player_high(percentage):
+    def maker(player_hand):
+        if random() < percentage:
+            player_high_suit = Card.get_suit_int(player_hand[0])
+            new_card_suit = Card.next_suit(player_hand[0])
+            new_card = Card.new_from_ints(Card.get_rank_int(player_hand[0]), new_card_suit)
+            if new_card == player_hand[1]:
+                new_card_suit = Card.next_suit(new_card)
+            new_card = Card.new_from_ints(Card.get_rank_int(player_hand[0]), new_card_suit)
+            Card.print_pretty_cards([new_card])
+            return [new_card]
+    return maker
+
+
+base_strategies = {
+    'pre_flop': base_pre_flop,
+    'post_flop': base_post_flop,
+    'river': base_river
+}
 
 if __name__ == "__main__":
 
