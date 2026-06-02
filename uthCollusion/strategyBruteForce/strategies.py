@@ -28,9 +28,9 @@ def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> list[int]:
                     extras.append(Card.new_from_ints(i, new_suit))
                     ranks.append(i)
                     break
+        hand = hand+extras
 
-        return evaluation.evaluate(hand + extras, board)
-        #Pull in dummy cards not connected to hand or board to fill out the hand for evaluation
+    return evaluation.evaluate(hand, board)
 
 def count_outs(player_hand: list[int], board: list[int], dead_cards: list[int] = []) -> dict[str, int]:
     '''
