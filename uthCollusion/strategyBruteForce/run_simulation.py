@@ -19,7 +19,7 @@ def calc_blind_payout(player_rank):
 
 def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker):
     deck = Deck()
-    player_hand = deck.draw(2)
+    player_hand = sorted(deck.draw(2))
     board = []
     dead_cards = deck.pull_many(dead_card_maker(player_hand))
 
@@ -48,9 +48,10 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
     dealer_rank = evaluation.evaluate(dealer_hand, board)
     player_rank = evaluation.evaluate(player_hand, board)
     ante_bet = 0
+
     # Check if dealer qualifies
     # 6185 is max rank for a pair
-    if dealer_rank < 6185:
+    if dealer_rank <= 6185:
         ante_bet = 1
     
     result = 0
@@ -109,7 +110,7 @@ def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_c
     return total / hands
 
 if __name__ == "__main__":
-    #base_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000)
+    always_bet_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000)
 
     base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=10000)
     # base = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], 
