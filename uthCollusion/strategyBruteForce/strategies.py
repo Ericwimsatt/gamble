@@ -40,6 +40,7 @@ def count_outs(player_hand: list[int], board: list[int], dead_cards: list[int] =
 
     deck = Deck()
     deck.pull_many(used_cards)
+    deck.pull_many(dead_cards)
     remaining = deck.cards
 
     outs = []
@@ -81,7 +82,8 @@ def base_river(player_hand, board, dead_cards):
 
 #Dead-Card-Dependent
 def pass_if_dead_pair(player_hand, dead_cards):
-        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
             return False
         if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
             return True
@@ -96,7 +98,8 @@ def pass_if_dead_pair(player_hand, dead_cards):
 def pass_if_dead_pair_unless_ace_queen(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 12 and Card.get_rank_int(player_hand[1]) >= 10:
             return True
-        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
             return False
         if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
             return True
@@ -110,7 +113,8 @@ def pass_if_dead_pair_unless_pocket_pair(player_hand, dead_cards):
         hand_rank = eval_even_if_unfull(player_hand, [])
         if hand_rank <= 5955: # pair of 3s or better
             return True
-        if player_hand[0] in dead_cards or player_hand[1] in dead_cards:
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
             return False
         if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
             return True
@@ -121,31 +125,61 @@ def pass_if_dead_pair_unless_pocket_pair(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 12:
             return True
 
+def pass_if_dead_pair_unless_eights_pocket_pair(player_hand, dead_cards):
+        hand_rank = eval_even_if_unfull(player_hand, [])
+        if hand_rank <= 4865: # pair of 8s or better
+            return True
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
+
+def pass_if_dead_pair_unless_face_pocket_pair(player_hand, dead_cards):
+        hand_rank = eval_even_if_unfull(player_hand, [])
+        if hand_rank <= 4425: # pair of 8s or better
+            return True
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
 
 #Dead-Card Makers
 def dead_cards_matching_player_high(percentage):
     def maker(player_hand):
         if random() < percentage:
-            high_card = player_hand[0]
+            high_card = player_hand[1]
             new_card_suit = Card.next_suit(high_card)
             new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
-            if new_card == high_card:
+            while new_card == high_card or new_card == player_hand[0]:
                 new_card_suit = Card.next_suit(new_card)
-            new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
-            Card.print_pretty_cards([new_card])
+                new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
             return [new_card]
     return maker
 
 def dead_cards_matching_player_low(percentage):
     def maker(player_hand):
         if random() < percentage:
-            low_card = player_hand[1]
+            low_card = player_hand[0]
             new_card_suit = Card.next_suit(low_card)
             new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
-            if new_card == low_card:
+            while new_card == low_card or new_card == player_hand[1]:
                 new_card_suit = Card.next_suit(new_card)
-            new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
-            Card.print_pretty_cards([new_card])
+                new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
+
             return [new_card]
     return maker
 
@@ -157,13 +191,16 @@ base_strategies = {
 
 if __name__ == "__main__":
 
-    print("Out count check")
-    print(count_outs([Card.new('Ah'), Card.new('Kh')], [Card.new('Qh'), Card.new('Jh'), Card.new('2h')]))
-    print(count_outs([Card.new('Kh'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jh'), Card.new('2h')]))
-    print(count_outs([Card.new('3h'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jh'), Card.new('2c')]))
-    print(count_outs([Card.new('Jh'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jd'), Card.new('2c')]))
-    print(count_outs([Card.new('Qh'), Card.new('Js')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
-    print(count_outs([Card.new('4h'), Card.new('Ts')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
+    # print("Out count check")
+    # print(count_outs([Card.new('Ah'), Card.new('Kh')], [Card.new('Qh'), Card.new('Jh'), Card.new('2h')]))
+    # print(count_outs([Card.new('Kh'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jh'), Card.new('2h')]))
+    # print(count_outs([Card.new('3h'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jh'), Card.new('2c')]))
+    # print(count_outs([Card.new('Jh'), Card.new('Ks')], [Card.new('Qh'), Card.new('Jd'), Card.new('2c')]))
+    # print(count_outs([Card.new('Qh'), Card.new('Js')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
+    # print(count_outs([Card.new('4h'), Card.new('Ts')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
+
+    print(eval_even_if_unfull([Card.new('Ah'), Card.new('As')]))
+    print(eval_even_if_unfull([Card.new('Th'), Card.new('Ts')]))
 
 
 
