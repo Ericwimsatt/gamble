@@ -110,9 +110,9 @@ def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_c
     return total / hands
 
 if __name__ == "__main__":
-    always_bet_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000)
+    always_bet_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000000)
 
-    base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=10000)
+    base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=10000000)
     # base = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], 
     #                dead_card_maker=dead_cards_matching_player_high(1), hands=100000)
     # change = run_simulation(pass_if_dead_pair, base_strategies['post_flop'], base_strategies['river'], 
