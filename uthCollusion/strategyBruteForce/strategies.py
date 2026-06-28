@@ -2,7 +2,7 @@ from treys import Card, evaluation, Deck
 from random import random
 
 #### UTILITIES ###
-def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> list[int]:
+def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> int:
     ''' 
     Roughly score a hand even if it has less than 5 cards. Add the least useful cards (approximately) to get a
     sense of the value of the visible cards. 
@@ -29,14 +29,14 @@ def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> list[int]:
 
     return evaluation.evaluate(hand, board)
 
-def count_outs(player_hand: list[int], board: list[int], dead_cards: list[int] = []) -> dict[str, int]:
+def count_outs(player_hand: list[int], board: list[int], dead_cards: list[int] = []) -> int:
     '''
     Counts the number of outs for a hand given the current board and dead cards. 
     '''
     
     player_score = evaluation.evaluate(player_hand, board)
 
-    used_cards = set(player_hand + board)
+    used_cards = list(player_hand + board)
 
     deck = Deck()
     deck.pull_many(used_cards)
@@ -126,16 +126,28 @@ def pass_if_dead_pair_unless_pocket_pair(player_hand, dead_cards):
 def dead_cards_matching_player_high(percentage):
     def maker(player_hand):
         if random() < percentage:
-            player_high_suit = Card.get_suit_int(player_hand[0])
-            new_card_suit = Card.next_suit(player_hand[0])
-            new_card = Card.new_from_ints(Card.get_rank_int(player_hand[0]), new_card_suit)
-            if new_card == player_hand[1]:
+            high_card = player_hand[0]
+            new_card_suit = Card.next_suit(high_card)
+            new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
+            if new_card == high_card:
                 new_card_suit = Card.next_suit(new_card)
-            new_card = Card.new_from_ints(Card.get_rank_int(player_hand[0]), new_card_suit)
+            new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
             Card.print_pretty_cards([new_card])
             return [new_card]
     return maker
 
+def dead_cards_matching_player_low(percentage):
+    def maker(player_hand):
+        if random() < percentage:
+            low_card = player_hand[1]
+            new_card_suit = Card.next_suit(low_card)
+            new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
+            if new_card == low_card:
+                new_card_suit = Card.next_suit(new_card)
+            new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
+            Card.print_pretty_cards([new_card])
+            return [new_card]
+    return maker
 
 base_strategies = {
     'pre_flop': base_pre_flop,

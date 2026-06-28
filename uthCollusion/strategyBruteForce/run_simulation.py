@@ -1,4 +1,4 @@
-from treys import Card, Deck, evaluation
+from treys import Deck, evaluation
 from strategies import *
 
 def calc_blind_payout(player_rank):
@@ -16,6 +16,47 @@ def calc_blind_payout(player_rank):
         return 1
     else:
         return 0
+
+class gameStats:
+    def __init__(self):
+        self.player_wins = 0
+        self.dealer_wins = 0
+        self.pushes = 0
+        self.dealer_qualifies = 0
+        self.play_bet_total = 0
+        self.ante_bet_total = 0
+        self.player_win_play_bet_total = 0
+        self.dealer_win_play_bet_total = 0
+        self.push_play_bet_total = 0
+        self.blind_payout_total = 0
+        self.folds = 0
+        self.bad_folds = 0
+        self.game_count = 0
+
+    def accumulate(self, new_game_stats):
+        self.player_wins += new_game_stats.player_wins
+        self.dealer_wins += new_game_stats.dealer_wins
+        self.pushes += new_game_stats.pushes
+        self.dealer_qualifies += new_game_stats.dealer_qualifies
+        self.play_bet_total += new_game_stats.play_bet_total
+        self.player_win_play_bet_total += new_game_stats.player_win_play_bet_total
+        self.dealer_win_play_bet_total += new_game_stats.dealer_win_play_bet_total
+        self.push_play_bet_total += new_game_stats.push_play_bet_total
+        self.blind_payout_total += new_game_stats.blind_payout_total
+        self.folds += new_game_stats.folds
+        self.bad_folds += new_game_stats.bad_folds
+
+    def __str__(self):
+        return "Player Wins: {},\n Dealer Wins: {},\n Pushes: {},\n Dealer Qualifies: {},\n Play Bet Total: {},\n Player Win Play Bet Total: {},\n Dealer Win Play Bet Total: {},\n Push Play Bet Total: {},\n Blind Payout Total: {},\n Folds: {},\n Bad Folds: {}".format(
+            self.player_wins, self.dealer_wins, self.pushes, self.dealer_qualifies, self.play_bet_total, self.player_win_play_bet_total, self.dealer_win_play_bet_total, self.push_play_bet_total, self.blind_payout_total, self.folds, self.bad_folds
+        )
+    
+    def average_str(self):
+        if self.game_count == 0:
+            return "No games played"
+        return "Player Wins: {},\n Dealer Wins: {},\n Pushes: {},\n Dealer Qualifies: {},\n Play Bet Total: {},\n Player Win Play Bet Total: {},\n Dealer Win Play Bet Total: {},\n Push Play Bet Total: {},\n Blind Payout Total: {},\n Folds: {},\n Bad Folds: {}".format(
+            self.player_wins / self.game_count, self.dealer_wins / self.game_count, self.pushes / self.game_count, self.dealer_qualifies / self.game_count, self.play_bet_total / self.game_count, self.player_win_play_bet_total / self.game_count, self.dealer_win_play_bet_total / self.game_count, self.push_play_bet_total / self.game_count, self.blind_payout_total / self.game_count, self.folds / self.game_count, self.bad_folds / self.game_count
+        )
 
 def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker):
     deck = Deck()
@@ -39,12 +80,6 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
         if river_strategy(player_hand, board, dead_cards):
             play_bet = 1
 
-    # print("Evaling hand")
-    # Card.print_pretty_cards(player_hand)
-    # Card.print_pretty_cards(board)
-    # Card.print_pretty_cards(dealer_hand)
-    # evaluation.hand_summary(board, [player_hand, dealer_hand])
-
     dealer_rank = evaluation.evaluate(dealer_hand, board)
     player_rank = evaluation.evaluate(player_hand, board)
     ante_bet = 0
@@ -66,51 +101,52 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
     else:
         result = - play_bet - ante_bet - 1
 
+    round_stats = gameStats()
+    round_stats.game_count = 1
+    round_stats.player_wins = 1 if player_rank < dealer_rank else 0
+    round_stats.dealer_wins = 1 if player_rank > dealer_rank else 0
+    round_stats.pushes = 1 if player_rank == dealer_rank else 0
+    round_stats.ante_bet_total = 1 if dealer_rank <= 6185 else 0
+    round_stats.dealer_qualifies = 1 if ante_bet else 0
+    round_stats.play_bet_total = play_bet
+    round_stats.player_win_play_bet_total = play_bet if result > 0 else 0
+    round_stats.dealer_win_play_bet_total = play_bet if result < 0 else 0
+    round_stats.push_play_bet_total = play_bet if result == 0 else 0
+    round_stats.blind_payout_total = calc_blind_payout(player_rank) if player_rank < dealer_rank else 0
+    round_stats.folds = 1 if play_bet == 0 else 0
+    round_stats.bad_folds = 1 if play_bet == 0 and player_rank < dealer_rank else 0
 
-    return result, {
-        "player_wins": 1 if result > 0 else 0,
-        "dealer_wins": 1 if result < 0 else 0,
-        "pushes": 1 if result == 0 else 0,
-        "dealer_qualifies": 1 if ante_bet else 0,
-        "play_bet_total": play_bet,
-        "player_win_play_bet_total": play_bet if result > 0 else 0,
-        "dealer_win_play_bet_total": play_bet if result < 0 else 0,
-        "push_play_bet_total": play_bet if result == 0 else 0,
-        "blind_payout_total": blind_payout if result > 0 else 0,
-        "folds": 1 if play_bet == 0 else 0,
-        "bad_folds": 1 if play_bet == 0 and player_rank < dealer_rank else 0
-    }
+    result = 0
+    if round_stats.player_wins == 1:
+        result = round_stats.play_bet_total + round_stats.blind_payout_total + round_stats.ante_bet_total
+        return result, round_stats
+    if round_stats.dealer_wins == 1:
+        result = -round_stats.play_bet_total - round_stats.ante_bet_total - 1 # blind payout
+        return result, round_stats
+    if round_stats.pushes == 1:
+        result = 0
+        return result, round_stats
+    else:
+        raise Exception("Invalid game state: player_rank: {}, dealer_rank: {}, result: {}".format(player_rank, dealer_rank, result))
+
 
 def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=lambda hand: [], hands=1000):
     total = 0
-    play_stats = {
-        "player_wins": 0,
-        "dealer_wins": 0,
-        "pushes": 0,
-        "dealer_qualifies": 0,
-        "play_bet_total": 0,
-        "player_win_play_bet_total": 0,
-        "dealer_win_play_bet_total": 0,
-        "push_play_bet_total": 0,
-        "blind_payout_total": 0,
-        "folds": 0,
-        "bad_folds": 0
-    }
+    cumulative_stats = gameStats()
+
     for _ in range(hands):
         result, round_data = play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker)
         total += result
-        for key in play_stats:
-            play_stats[key] += round_data.get(key, 0)
-    print("Average result: {}".format(total / hands))
-    for key in play_stats:
-        print("TOTAL {} : {}".format(key, play_stats[key]))
-    print("________")
-    for key in play_stats:
-        print("AVERAGE {} : {}".format(key, play_stats[key] / hands))
+        cumulative_stats.accumulate(round_data)
+    print("CUMULATIVE STATS:")
+    print(cumulative_stats)
+    print("AVERAGE STATS:")
+    print(cumulative_stats.average_str())
+   
     return total / hands
 
 if __name__ == "__main__":
-    always_bet_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000000)
+    #always_bet_no_deads = run_simulation(lambda hand, dead_cards: True, base_strategies['post_flop'], base_strategies['river'], hands=10000000)
 
     base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=10000000)
     # base = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], 
