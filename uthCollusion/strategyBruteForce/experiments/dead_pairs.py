@@ -25,18 +25,18 @@ def dead_high_pair_strats():
 
 
 def dead_low_pair_strats_specific():
-    num_hands = 4000
+    num_hands = 10000
 
     low_pair_runner = Runner("Low Dead Pair Strategies-second filter")
-    for min_rank in range(0,11):
-        low_pair_runner.add_task(strategy_name="Bet Pre Flop", deads_pattern_name="Always low pair", player_hand=f"min_val {Card.STR_RANKS[min_rank]}", pre_flop_strategy=lambda _, __: True, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands, player_hand_maker=random_above_rank_inclusive(min_rank))
-        low_pair_runner.add_task(strategy_name="Check Pre Flop", deads_pattern_name="Always low pair", player_hand=f"min_val {Card.STR_RANKS[min_rank]}", pre_flop_strategy=lambda _, __: False, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands, player_hand_maker=random_above_rank_inclusive(min_rank))
-
+    for high_rank in range(9,13):
+        for low_rank in range(4, high_rank):
+            low_pair_runner.add_task(strategy_name="Bet Pre Flop", deads_pattern_name=f"Always low pair", player_hand=f"{Card.STR_RANKS[high_rank]} + {Card.STR_RANKS[low_rank]} ", pre_flop_strategy=lambda _, __: True, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker = dead_cards_matching_player_low(1), hands=num_hands, player_hand_maker=set_both_cards(high_rank, low_rank))
+            low_pair_runner.add_task(strategy_name="Check Pre Flop", deads_pattern_name=f"Always low pair", player_hand=f"{Card.STR_RANKS[high_rank]} + {Card.STR_RANKS[low_rank]} ", pre_flop_strategy=lambda _, __: False, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker = dead_cards_matching_player_low(1), hands=num_hands, player_hand_maker=set_both_cards(high_rank, low_rank))
     low_pair_runner.run_tasks()
 
 #high pair-try lower pairs
 def dead_high_pair_strats_specific():
-    num_hands = 6000
+    num_hands = 10000
     high_pair_runner = Runner("High Dead Pair Strategies-second filter")
     for min_rank in range(0,6):
         high_pair_runner.add_task(strategy_name="Bet Pre FLop", deads_pattern_name="Always high pair", player_hand=f"Pocket {min_rank + 2}", pre_flop_strategy=lambda _, __: True, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_high(1), hands=num_hands, player_hand_maker=pocket_pair(min_rank))

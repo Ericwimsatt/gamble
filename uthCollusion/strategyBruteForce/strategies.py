@@ -106,6 +106,7 @@ def base_river(player_hand, board, dead_cards):
 #j+8
 #10 + 9
 # if is a pair w/ higher card, need pocket 4 or higher to bet
+# If is pair w/ lower card, need A6, K8, QT to bet
 
 #Dead-Card-Dependent
 def pass_if_dead_pair(player_hand, dead_cards):

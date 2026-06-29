@@ -8,7 +8,7 @@ def base_strat():
     runner.run_tasks()
 
 def base_check():
-    num_hands = 2000
+    num_hands = 10000
     runner = Runner("Base Strat Check")
     for high_rank in range(7,10):
         for low_rank in range(0, high_rank):
