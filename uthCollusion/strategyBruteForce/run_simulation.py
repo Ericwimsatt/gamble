@@ -1,7 +1,17 @@
 from time import time
 
-from treys import Deck, evaluation
+from treys import Deck, Evaluator
 from strategies import *
+
+_evaluator = Evaluator()
+
+def _pull_many(deck, cards):
+    if cards is None:
+        return []
+    for card in cards:
+        if card in deck.cards:
+            deck.cards.remove(card)
+    return cards
 
 
 def calc_blind_payout(player_rank):
@@ -73,7 +83,7 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
     deck = Deck()
     player_hand = sorted(deck.draw(2))
     board = []
-    dead_cards = deck.pull_many(dead_card_maker(player_hand))
+    dead_cards = _pull_many(deck, dead_card_maker(player_hand))
 
     dealer_hand = deck.draw(2)
 
@@ -91,8 +101,8 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
         if river_strategy(player_hand, board, dead_cards):
             play_bet = 1
 
-    dealer_rank = evaluation.evaluate(dealer_hand, board)
-    player_rank = evaluation.evaluate(player_hand, board)
+    dealer_rank = _evaluator.evaluate(dealer_hand, board)
+    player_rank = _evaluator.evaluate(player_hand, board)
 
 
     round_stats = gameStats()

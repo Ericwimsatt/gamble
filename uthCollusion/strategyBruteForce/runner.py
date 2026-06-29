@@ -17,6 +17,7 @@ class Runner:
         self.tasks.append(task)
     
     def run_tasks(self):
+        print("Running tasks, total tasks: {}".format(len(self.tasks)))
         with ThreadPoolExecutor(max_workers=len(self.tasks)) as executor:
             future_to_meta = {}
             for task in self.tasks:
@@ -48,8 +49,9 @@ class Runner:
             return
         hands = next(iter(self.results.values())).stats['game_count']
         safe_name = self.name.replace(" ", "_").replace("/", "_").replace("\\", "_")
-        os.makedirs("raw_outs", exist_ok=True)
-        filepath = os.path.join("raw_outs", f"{safe_name}_{hands}.json")
+        out_dir = os.path.join("uthCollusion", "strategyBruteForce", "raw_outs")
+        os.makedirs(out_dir, exist_ok=True)
+        filepath = os.path.join(out_dir, f"{safe_name}_{hands}.json")
         output = {
             "runner": self.name,
             "hands": hands,
@@ -66,11 +68,12 @@ class Runner:
         print(f"Results written to {filepath}")
 
 if __name__ == "__main__":
-    num_hands = 100
     runner = Runner("Base")
-    runner.add_task(("Base Strat", "None", base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], None, num_hands))
+    runner.add_task(("Base Strat", "None", base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], None, 100000))
     runner.run_tasks()
     # Strat comparison when low pair is made
+    num_hands = 10000
+
     low_pair_runner = Runner("Low Pair Dead Card Strategies")
     low_pair_runner.add_task(("No Bet when low pair", "Always low pair", pass_if_dead_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
     low_pair_runner.add_task(("No Bet when low pair unless both high", "Always low pair", pass_if_dead_pair_unless_ace_queen, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
@@ -78,6 +81,6 @@ if __name__ == "__main__":
     low_pair_runner.add_task(("No Bet when low pair unless pocket pair of eights", "Always low pair", pass_if_dead_pair_unless_eights_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
     low_pair_runner.add_task(("No Bet when low pair unless face pocket pair", "Always low pair", pass_if_dead_pair_unless_face_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
     print(low_pair_runner.tasks)
-    runner.run_tasks()
+    low_pair_runner.run_tasks()
 
 

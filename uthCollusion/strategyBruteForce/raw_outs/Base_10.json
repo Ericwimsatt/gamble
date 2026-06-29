@@ -1,0 +1,40 @@
+{
+  "runner": "Base",
+  "hands": 10,
+  "results": {
+    "Base Strat // None": {
+      "full": {
+        "units_won_total": -4,
+        "player_wins": 5,
+        "dealer_wins": 4,
+        "pushes": 1,
+        "dealer_qualifies": 7,
+        "play_bet_total": 14,
+        "ante_bet_total": 7,
+        "player_win_play_bet_total": 7,
+        "dealer_win_play_bet_total": 6,
+        "push_play_bet_total": 1,
+        "blind_payout_total": 1,
+        "folds": 0,
+        "bad_folds": 0,
+        "game_count": 10
+      },
+      "averages": {
+        "units_won_total": -0.4,
+        "player_wins": 0.5,
+        "dealer_wins": 0.4,
+        "pushes": 0.1,
+        "dealer_qualifies": 0.7,
+        "play_bet_total": 1.4,
+        "ante_bet_total": 0.7,
+        "player_win_play_bet_total": 0.7,
+        "dealer_win_play_bet_total": 0.6,
+        "push_play_bet_total": 0.1,
+        "blind_payout_total": 0.1,
+        "folds": 0.0,
+        "bad_folds": 0.0,
+        "game_count": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "runner": "High Dead Pair Strategies",
+  "hands": 10000,
+  "results": {
+    "No Bet when dead pair unless pocket pair // Always high pair": {
+      "full": {
+        "units_won_total": -4082.5,
+        "player_wins": 4522,
+        "dealer_wins": 5167,
+        "pushes": 311,
+        "dealer_qualifies": 8376,
+        "play_bet_total": 14787,
+        "ante_bet_total": 8376,
+        "player_win_play_bet_total": 8133,
+        "dealer_win_play_bet_total": 6208,
+        "push_play_bet_total": 446,
+        "blind_payout_total": 1496.5,
+        "folds": 1902,
+        "bad_folds": 143,
+        "game_count": 10000
+      },
+      "averages": {
+        "units_won_total": -0.40825,
+        "player_wins": 0.4522,
+        "dealer_wins": 0.5167,
+        "pushes": 0.0311,
+        "dealer_qualifies": 0.8376,
+        "play_bet_total": 1.4787,
+        "ante_bet_total": 0.8376,
+        "player_win_play_bet_total": 0.8133,
+        "dealer_win_play_bet_total": 0.6208,
+        "push_play_bet_total": 0.0446,
+        "blind_payout_total": 0.14965,
+        "folds": 0.1902,
+        "bad_folds": 0.0143,
+        "game_count": 1.0
+      }
+    },
+    "No Bet when dead pair unless face pocket pair // Always high pair": {
+      "full": {
+        "units_won_total": -3857.5,
+        "player_wins": 4505,
+        "dealer_wins": 5129,
+        "pushes": 366,
+        "dealer_qualifies": 8300,
+        "play_bet_total": 14348,
+        "ante_bet_total": 8300,
+        "player_win_play_bet_total": 7830,
+        "dealer_win_play_bet_total": 6002,
+        "push_play_bet_total": 516,
+        "blind_payout_total": 1891.5,
+        "folds": 1887,
+        "bad_folds": 167,
+        "game_count": 10000
+      },
+      "averages": {
+        "units_won_total": -0.38575,
+        "player_wins": 0.4505,
+        "dealer_wins": 0.5129,
+        "pushes": 0.0366,
+        "dealer_qualifies": 0.83,
+        "play_bet_total": 1.4348,
+        "ante_bet_total": 0.83,
+        "player_win_play_bet_total": 0.783,
+        "dealer_win_play_bet_total": 0.6002,
+        "push_play_bet_total": 0.0516,
+        "blind_payout_total": 0.18915,
+        "folds": 0.1887,
+        "bad_folds": 0.0167,
+        "game_count": 1.0
+      }
+    },
+    "No Bet when dead pair unless pocket pair of eights // Always high pair": {
+      "full": {
+        "units_won_total": -3546.5,
+        "player_wins": 4430,
+        "dealer_wins": 5265,
+        "pushes": 305,
+        "dealer_qualifies": 8371,
+        "play_bet_total": 14428,
+        "ante_bet_total": 8371,
+        "player_win_play_bet_total": 7817,
+        "dealer_win_play_bet_total": 6180,
+        "push_play_bet_total": 431,
+        "blind_payout_total": 2646.5,
+        "folds": 1978,
+        "bad_folds": 163,
+        "game_count": 10000
+      },
+      "averages": {
+        "units_won_total": -0.35465,
+        "player_wins": 0.443,
+        "dealer_wins": 0.5265,
+        "pushes": 0.0305,
+        "dealer_qualifies": 0.8371,
+        "play_bet_total": 1.4428,
+        "ante_bet_total": 0.8371,
+        "player_win_play_bet_total": 0.7817,
+        "dealer_win_play_bet_total": 0.618,
+        "push_play_bet_total": 0.0431,
+        "blind_payout_total": 0.26465,
+        "folds": 0.1978,
+        "bad_folds": 0.0163,
+        "game_count": 1.0
+      }
+    },
+    "No Bet when dead pair // Always high pair": {
+      "full": {
+        "units_won_total": -3647.0,
+        "player_wins": 4517,
+        "dealer_wins": 5129,
+        "pushes": 354,
+        "dealer_qualifies": 8293,
+        "play_bet_total": 10869,
+        "ante_bet_total": 8293,
+        "player_win_play_bet_total": 6485,
+        "dealer_win_play_bet_total": 4049,
+        "push_play_bet_total": 335,
+        "blind_payout_total": 1431.0,
+        "folds": 2133,
+        "bad_folds": 132,
+        "game_count": 10000
+      },
+      "averages": {
+        "units_won_total": -0.3647,
+        "player_wins": 0.4517,
+        "dealer_wins": 0.5129,
+        "pushes": 0.0354,
+        "dealer_qualifies": 0.8293,
+        "play_bet_total": 1.0869,
+        "ante_bet_total": 0.8293,
+        "player_win_play_bet_total": 0.6485,
+        "dealer_win_play_bet_total": 0.4049,
+        "push_play_bet_total": 0.0335,
+        "blind_payout_total": 0.1431,
+        "folds": 0.2133,
+        "bad_folds": 0.0132,
+        "game_count": 1.0
+      }
+    },
+    "No Bet when dead pair unless both low // Always high pair": {
+      "full": {
+        "units_won_total": -4053.0,
+        "player_wins": 4441,
+        "dealer_wins": 5182,
+        "pushes": 377,
+        "dealer_qualifies": 8281,
+        "play_bet_total": 10932,
+        "ante_bet_total": 8281,
+        "player_win_play_bet_total": 6427,
+        "dealer_win_play_bet_total": 4128,
+        "push_play_bet_total": 377,
+        "blind_payout_total": 1366.0,
+        "folds": 2164,
+        "bad_folds": 141,
+        "game_count": 10000
+      },
+      "averages": {
+        "units_won_total": -0.4053,
+        "player_wins": 0.4441,
+        "dealer_wins": 0.5182,
+        "pushes": 0.0377,
+        "dealer_qualifies": 0.8281,
+        "play_bet_total": 1.0932,
+        "ante_bet_total": 0.8281,
+        "player_win_play_bet_total": 0.6427,
+        "dealer_win_play_bet_total": 0.4128,
+        "push_play_bet_total": 0.0377,
+        "blind_payout_total": 0.1366,
+        "folds": 0.2164,
+        "bad_folds": 0.0141,
+        "game_count": 1.0
+      }
+    }
+  }
+}

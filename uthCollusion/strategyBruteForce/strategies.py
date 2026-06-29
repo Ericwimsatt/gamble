@@ -1,5 +1,27 @@
-from treys import Card, evaluation, Deck
+from treys import Card, Deck, Evaluator
 from random import random
+
+_evaluator = Evaluator()
+
+def _card_from_ints(rank_int, suit_int):
+    rank_prime = Card.PRIMES[rank_int]
+    bitrank = 1 << rank_int << 16
+    suit = suit_int << 12
+    rank = rank_int << 8
+    return bitrank | suit | rank | rank_prime
+
+def _next_suit(card):
+    suits = [1, 2, 4, 8]
+    suit = Card.get_suit_int(card)
+    return suits[(suits.index(suit) + 1) % 4]
+
+def _pull_many(deck, cards):
+    if cards is None:
+        return []
+    for card in cards:
+        if card in deck.cards:
+            deck.cards.remove(card)
+    return cards
 
 #### UTILITIES ###
 def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> int:
@@ -12,35 +34,35 @@ def eval_even_if_unfull(hand: list[int], board: list[int] = []) -> int:
         extras = []
         ranks = sorted([Card.get_rank_int(card) for card in all_cards])
         # Check 1 card so we don't accidentally make a straight
-        new_suit = Card.next_suit(all_cards[0])
+        new_suit = _next_suit(all_cards[0])
 
         # if highest card is less than 5 there's a risk we make a straight, so add a 6 to prevent
         if ranks[-1] < 4:
-            extras.append(Card.new_from_ints(6, new_suit))
+            extras.append(_card_from_ints(6, new_suit))
             ranks.append(6)
 
         while len(all_cards) + len(extras) < 5:
             for i in range(5):
                 if i not in ranks:
-                    extras.append(Card.new_from_ints(i, new_suit))
+                    extras.append(_card_from_ints(i, new_suit))
                     ranks.append(i)
                     break
         hand = hand+extras
 
-    return evaluation.evaluate(hand, board)
+    return _evaluator.evaluate(hand, board)
 
 def count_outs(player_hand: list[int], board: list[int], dead_cards: list[int] = []) -> int:
     '''
     Counts the number of outs for a hand given the current board and dead cards. 
     '''
     
-    player_score = evaluation.evaluate(player_hand, board)
+    player_score = _evaluator.evaluate(player_hand, board)
 
     used_cards = list(player_hand + board)
 
     deck = Deck()
-    deck.pull_many(used_cards)
-    deck.pull_many(dead_cards)
+    _pull_many(deck, used_cards)
+    _pull_many(deck, dead_cards)
     remaining = deck.cards
 
     outs = []
@@ -64,7 +86,7 @@ def base_pre_flop(player_hand, dead_cards):
             return True
         
 def base_post_flop(player_hand, board, dead_cards):
-    hand_rank = evaluation.evaluate(player_hand, board)
+    hand_rank = _evaluator.evaluate(player_hand, board)
     if hand_rank <= 3321: # 2 pair or better
         return True
     
@@ -94,6 +116,22 @@ def pass_if_dead_pair(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 12:
             return True
         
+def pass_if_dead_pair_unless_high_cards(min_rank):
+    def strategy(player_hand, dead_cards):
+        if Card.get_rank_int(player_hand[0]) >= min_rank and Card.get_rank_int(player_hand[1]) >= min_rank:
+            return True
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
+    return strategy
 
 def pass_if_dead_pair_unless_ace_queen(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 12 and Card.get_rank_int(player_hand[1]) >= 10:
@@ -124,6 +162,22 @@ def pass_if_dead_pair_unless_pocket_pair(player_hand, dead_cards):
             return True
         if Card.get_rank_int(player_hand[0]) >= 12:
             return True
+def pass_if_dead_pair_unless_min_pair_maker(min_rank):
+    def strategy(player_hand, dead_cards):
+        if Card.get_rank_int(player_hand[0]) == Card.get_rank_int(player_hand[1]) and Card.get_rank_int(player_hand[0]) >= min_rank:
+            return True
+        dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
+        if Card.get_rank_int(player_hand[0]) in dead_cards_ranks or Card.get_rank_int(player_hand[1]) in dead_cards_ranks:
+            return False
+        if Card.get_rank_int(player_hand[0]) == 9 and Card.get_rank_int(player_hand[1]) >= 8:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 10 and Card.get_rank_int(player_hand[1]) == 6:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 11 and Card.get_rank_int(player_hand[1]) == 3:
+            return True
+        if Card.get_rank_int(player_hand[0]) >= 12:
+            return True
+    return strategy
 
 def pass_if_dead_pair_unless_eights_pocket_pair(player_hand, dead_cards):
         hand_rank = eval_even_if_unfull(player_hand, [])
@@ -162,25 +216,26 @@ def dead_cards_matching_player_high(percentage):
     def maker(player_hand):
         if random() < percentage:
             high_card = player_hand[1]
-            new_card_suit = Card.next_suit(high_card)
-            new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
+            new_card_suit = _next_suit(high_card)
+            new_card = _card_from_ints(Card.get_rank_int(high_card), new_card_suit)
             while new_card == high_card or new_card == player_hand[0]:
-                new_card_suit = Card.next_suit(new_card)
-                new_card = Card.new_from_ints(Card.get_rank_int(high_card), new_card_suit)
+                new_card_suit = _next_suit(new_card)
+                new_card = _card_from_ints(Card.get_rank_int(high_card), new_card_suit)
             return [new_card]
+        return []
     return maker
 
 def dead_cards_matching_player_low(percentage):
     def maker(player_hand):
         if random() < percentage:
             low_card = player_hand[0]
-            new_card_suit = Card.next_suit(low_card)
-            new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
+            new_card_suit = _next_suit(low_card)
+            new_card = _card_from_ints(Card.get_rank_int(low_card), new_card_suit)
             while new_card == low_card or new_card == player_hand[1]:
-                new_card_suit = Card.next_suit(new_card)
-                new_card = Card.new_from_ints(Card.get_rank_int(low_card), new_card_suit)
-
+                new_card_suit = _next_suit(new_card)
+                new_card = _card_from_ints(Card.get_rank_int(low_card), new_card_suit)
             return [new_card]
+        return []
     return maker
 
 base_strategies = {
@@ -199,11 +254,7 @@ if __name__ == "__main__":
     # print(count_outs([Card.new('Qh'), Card.new('Js')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
     # print(count_outs([Card.new('4h'), Card.new('Ts')], [Card.new('Qs'), Card.new('Jh'), Card.new('2c')]))
 
-    print(eval_even_if_unfull([Card.new('Ah'), Card.new('As')]))
-    print(eval_even_if_unfull([Card.new('Th'), Card.new('Ts')]))
-
-
-
+    print(Card.get_rank_int(Card.new('Ah')), Card.get_rank_int(Card.new('Kh')), Card.get_rank_int(Card.new('Qh')), Card.get_rank_int(Card.new('Jh')), Card.get_rank_int(Card.new('Th')), Card.get_rank_int(Card.new('9h')), Card.get_rank_int(Card.new('8h')), Card.get_rank_int(Card.new('7h')), Card.get_rank_int(Card.new('6h')), Card.get_rank_int(Card.new('5h')), Card.get_rank_int(Card.new('4h')), Card.get_rank_int(Card.new('3h')), Card.get_rank_int(Card.new('2h')))
 
 
 
