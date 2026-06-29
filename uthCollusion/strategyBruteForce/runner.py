@@ -4,8 +4,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from strategies import *
 from run_simulation import run_simulation
 
-# type task = tuple[str, str, callable, callable, callable, callable | None, int]
-
 class Runner:
     def __init__(self, name):
         self.name = name
@@ -13,18 +11,17 @@ class Runner:
         self.results = {}
         self.results_summaries = {}
 
-    def add_task(self, task):
+    def add_task(self, **task):
         self.tasks.append(task)
-    
+
     def run_tasks(self):
         print("Running tasks, total tasks: {}".format(len(self.tasks)))
         with ThreadPoolExecutor(max_workers=len(self.tasks)) as executor:
             future_to_meta = {}
             for task in self.tasks:
-                strategy_name, deads_pattern_name, pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker, hands = task
-                name = f"{strategy_name} // {deads_pattern_name}"
-                future = executor.submit(run_simulation, pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker, hands=hands)
-                future_to_meta[future] = (name, hands)
+                name = f"{task.get('player_hand', '')} // {task['strategy_name']} // {task['deads_pattern_name']}"
+                future = executor.submit(run_simulation, task['pre_flop_strategy'], task['post_flop_strategy'], task['river_strategy'], task['dead_card_maker'], num_hands=task['hands'], player_hand_maker=task.get('player_hand_maker', None))
+                future_to_meta[future] = (name, task['hands'])
                 print(f"Submitted task: {name}")
 
             for future in as_completed(future_to_meta):
@@ -39,7 +36,7 @@ class Runner:
             print(f"{name}: Average Units Won: {self.results_summaries[name]}\n full results: \n{self.results[name].average_str()}")
         
         print("Summarized stats:")
-        for name in self.results.keys():
+        for name in sorted(self.results_summaries, key=lambda n: self.results_summaries[n], reverse=True):
             print(f"{name}: Average Units Won: {self.results_summaries[name]}")
 
         self._write_results()
@@ -69,17 +66,17 @@ class Runner:
 
 if __name__ == "__main__":
     runner = Runner("Base")
-    runner.add_task(("Base Strat", "None", base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], None, 100000))
+    runner.add_task(strategy_name="Base Strat", deads_pattern_name="None", pre_flop_strategy=base_strategies['pre_flop'], post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=None, hands=100000)
     runner.run_tasks()
     # Strat comparison when low pair is made
     num_hands = 10000
 
     low_pair_runner = Runner("Low Pair Dead Card Strategies")
-    low_pair_runner.add_task(("No Bet when low pair", "Always low pair", pass_if_dead_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
-    low_pair_runner.add_task(("No Bet when low pair unless both high", "Always low pair", pass_if_dead_pair_unless_ace_queen, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
-    low_pair_runner.add_task(("No Bet when low pair unless pocket pair", "Always low pair", pass_if_dead_pair_unless_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
-    low_pair_runner.add_task(("No Bet when low pair unless pocket pair of eights", "Always low pair", pass_if_dead_pair_unless_eights_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
-    low_pair_runner.add_task(("No Bet when low pair unless face pocket pair", "Always low pair", pass_if_dead_pair_unless_face_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), num_hands))
+    low_pair_runner.add_task(strategy_name="No Bet when low pair", deads_pattern_name="Always low pair", pre_flop_strategy=pass_if_dead_pair, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands)
+    low_pair_runner.add_task(strategy_name="No Bet when low pair unless both high", deads_pattern_name="Always low pair", pre_flop_strategy=pass_if_dead_pair_unless_ace_queen, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands)
+    low_pair_runner.add_task(strategy_name="No Bet when low pair unless pocket pair", deads_pattern_name="Always low pair", pre_flop_strategy=pass_if_dead_pair_unless_pocket_pair, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands)
+    low_pair_runner.add_task(strategy_name="No Bet when low pair unless pocket pair of eights", deads_pattern_name="Always low pair", pre_flop_strategy=pass_if_dead_pair_unless_eights_pocket_pair, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands)
+    low_pair_runner.add_task(strategy_name="No Bet when low pair unless face pocket pair", deads_pattern_name="Always low pair", pre_flop_strategy=pass_if_dead_pair_unless_face_pocket_pair, post_flop_strategy=base_strategies['post_flop'], river_strategy=base_strategies['river'], dead_card_maker=dead_cards_matching_player_low(1), hands=num_hands)
     print(low_pair_runner.tasks)
     low_pair_runner.run_tasks()
 

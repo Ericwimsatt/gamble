@@ -102,6 +102,9 @@ def base_river(player_hand, board, dead_cards):
         return True
     return False
 
+#optimal pre flop
+# if is a pair w/ lower card, need pocket 4 or higher to bet
+
 #Dead-Card-Dependent
 def pass_if_dead_pair(player_hand, dead_cards):
         dead_cards_ranks = [Card.get_rank_int(card) for card in dead_cards]
@@ -236,6 +239,16 @@ def dead_cards_matching_player_low(percentage):
                 new_card = _card_from_ints(Card.get_rank_int(low_card), new_card_suit)
             return [new_card]
         return []
+    return maker
+
+#player_hand_maker
+def pocket_pair(rank_int):
+    def maker():
+        suit1 = 1
+        suit2 = 2
+        card1 = _card_from_ints(rank_int, suit1)
+        card2 = _card_from_ints(rank_int, suit2)
+        return [card1, card2]
     return maker
 
 base_strategies = {

@@ -2,6 +2,7 @@ from time import time
 
 from treys import Deck, Evaluator
 from strategies import *
+from gameStats import gameStats
 
 _evaluator = Evaluator()
 
@@ -30,60 +31,18 @@ def calc_blind_payout(player_rank):
     else:
         return 0
 
-class gameStats:
-    stats = {}
-    def __init__(self):
-        self.stats ={
-            'units_won_total': 0,
-            'player_wins': 0,
-            'dealer_wins': 0,
-            'pushes': 0,
-            'dealer_qualifies': 0,
-            'play_bet_total': 0,
-            'ante_bet_total': 0,
-            'player_win_play_bet_total': 0,
-            'dealer_win_play_bet_total': 0,
-            'push_play_bet_total': 0,
-            'blind_payout_total': 0,
-            'folds': 0,
-            'bad_folds': 0,
-            'game_count': 0
-        }
 
-    def accumulate(self, new_game_stats):
-        for key in self.stats.keys():
-            self.stats[key] += new_game_stats.stats[key]
-
-    def set_field(self, field, value):
-        self.stats[field] = value
-    
-    def average_units_won(self):
-        if self.stats['game_count'] == 0:
-            return 0
-        return self.stats['units_won_total'] / self.stats['game_count']
-        
-    def __str__(self):
-        out_str = "Game Stats:\n"
-        for key in self.stats.keys():
-            out_str += "{}: {}\n".format(key, self.stats[key])
-        return out_str
-
-    
-    def average_str(self):
-        if self.stats['game_count'] == 0:
-            return "No games played"
-        out_str = "Average Game Stats:\n"
-        for key in self.stats.keys():
-            out_str += "{}: {}\n".format(key, self.stats[key] / self.stats['game_count'])
-        return out_str
-
-def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker):
+def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker, player_hand_maker=None):
     if not dead_card_maker:
         dead_card_maker = lambda hand: []
     deck = Deck()
-    player_hand = sorted(deck.draw(2))
+    if player_hand_maker:
+        player_hand = player_hand_maker()
+        deck.pull_many(player_hand)
+    else:
+        player_hand = sorted(deck.draw(2))
     board = []
-    dead_cards = _pull_many(deck, dead_card_maker(player_hand))
+    dead_cards = deck.pull_many(dead_card_maker(player_hand))
 
     dealer_hand = deck.draw(2)
 
@@ -136,28 +95,15 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
         raise Exception("Invalid game state: player_rank: {}, dealer_rank: {}, ".format(player_rank, dealer_rank))
 
 
-def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=lambda hand: [], hands=1000, progress_interval=30):
+def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=lambda hand: [], num_hands=1000, progress_interval=30, player_hand_maker=None):
     cumulative_stats = gameStats()
     clock = time()
 
-    for _ in range(hands):
-        round_data = play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker)
+    for _ in range(num_hands):
+        round_data = play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker, player_hand_maker)
         cumulative_stats.accumulate(round_data)
         if time() - clock > progress_interval:
             print("Progress: {} hands played".format(_))
             clock = time()
    
     return cumulative_stats
-
-if __name__ == "__main__":
-    base_no_deads = run_simulation(base_strategies['pre_flop'], base_strategies['post_flop'], base_strategies['river'], hands=100000)
-    print("Skip low dead pair always")
-    skip_low_dead_pair = run_simulation(pass_if_dead_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), hands=10000)
-    print("Except AQ")
-    skip_low_dead_pair_except_AQ = run_simulation(pass_if_dead_pair_unless_ace_queen, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), hands=10000)
-    print("Except pair 3s")
-    skip_low_dead_pair_except_pocket = run_simulation(pass_if_dead_pair_unless_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), hands=10000)
-    print("Except pair  eights")
-    skip_low_dead_pair_except_eights = run_simulation(pass_if_dead_pair_unless_eights_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), hands=10000)
-    print("except pair  face")
-    skip_low_dead_pair_except_face = run_simulation(pass_if_dead_pair_unless_face_pocket_pair, base_strategies['post_flop'], base_strategies['river'], dead_cards_matching_player_low(1), hands=10000)
