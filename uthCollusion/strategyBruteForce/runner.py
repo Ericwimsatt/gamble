@@ -20,7 +20,7 @@ class Runner:
             future_to_meta = {}
             for task in self.tasks:
                 name = f"{task.get('player_hand', '')} // {task['strategy_name']} // {task['deads_pattern_name']}"
-                future = executor.submit(run_simulation, task['pre_flop_strategy'], task['post_flop_strategy'], task['river_strategy'], task['dead_card_maker'], num_hands=task['hands'], player_hand_maker=task.get('player_hand_maker', None))
+                future = executor.submit(run_simulation, task['pre_flop_strategy'], task['post_flop_strategy'], task['river_strategy'], task.get('dead_card_maker', None), num_hands=task['hands'], player_hand_maker=task.get('player_hand_maker', None))
                 future_to_meta[future] = (name, task['hands'])
                 print(f"Submitted task: {name}")
 

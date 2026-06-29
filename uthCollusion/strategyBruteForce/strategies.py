@@ -1,5 +1,5 @@
 from treys import Card, Deck, Evaluator
-from random import random
+from random import randint, random
 
 _evaluator = Evaluator()
 
@@ -103,7 +103,9 @@ def base_river(player_hand, board, dead_cards):
     return False
 
 #optimal pre flop
-# if is a pair w/ lower card, need pocket 4 or higher to bet
+#j+8
+#10 + 9
+# if is a pair w/ higher card, need pocket 4 or higher to bet
 
 #Dead-Card-Dependent
 def pass_if_dead_pair(player_hand, dead_cards):
@@ -248,6 +250,30 @@ def pocket_pair(rank_int):
         suit2 = 2
         card1 = _card_from_ints(rank_int, suit1)
         card2 = _card_from_ints(rank_int, suit2)
+        return [card1, card2]
+    return maker
+
+def random_above_rank_inclusive(min_rank):
+    def maker():
+        hand = []
+        while len(hand) < 2:
+            rank_int = randint(min_rank, 12)
+            suit_int = list(Card.PRETTY_SUITS.keys())[randint(0, 3)]
+            card = _card_from_ints(rank_int, suit_int)
+            if card not in hand:
+                hand.append(card)
+        return hand
+    return maker
+
+def set_both_cards(rank1, rank2):
+    def maker():
+        suit1 = list(Card.PRETTY_SUITS.keys())[randint(0, 3)]
+        suit2 = list(Card.PRETTY_SUITS.keys())[randint(0, 3)]
+        card1 = _card_from_ints(rank1, suit1)
+        card2 = _card_from_ints(rank2, suit2)
+        if card2 == card1:
+            suit2 = _next_suit(card1)
+            card2 = _card_from_ints(rank2, suit2)
         return [card1, card2]
     return maker
 
