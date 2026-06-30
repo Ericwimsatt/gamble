@@ -217,9 +217,14 @@ def pass_if_dead_pair_unless_face_pocket_pair(player_hand, dead_cards):
         if Card.get_rank_int(player_hand[0]) >= 12:
             return True
 
+def river_seventeen(player_hand, board, dead_cards):
+    if count_outs(player_hand, board, dead_cards) < 17: 
+        return True
+    return False
+
 #Dead-Card Makers
 def dead_cards_matching_player_high(percentage):
-    def maker(player_hand):
+    def maker(player_hand, deck):
         if random() < percentage:
             high_card = player_hand[1]
             new_card_suit = _next_suit(high_card)
@@ -227,12 +232,12 @@ def dead_cards_matching_player_high(percentage):
             while new_card == high_card or new_card == player_hand[0]:
                 new_card_suit = _next_suit(new_card)
                 new_card = _card_from_ints(Card.get_rank_int(high_card), new_card_suit)
-            return [new_card]
+            return deck.pull(new_card)
         return []
     return maker
 
 def dead_cards_matching_player_low(percentage):
-    def maker(player_hand):
+    def maker(player_hand, deck):
         if random() < percentage:
             low_card = player_hand[0]
             new_card_suit = _next_suit(low_card)
@@ -240,9 +245,13 @@ def dead_cards_matching_player_low(percentage):
             while new_card == low_card or new_card == player_hand[1]:
                 new_card_suit = _next_suit(new_card)
                 new_card = _card_from_ints(Card.get_rank_int(low_card), new_card_suit)
-            return [new_card]
+            return deck.pull(new_card)
         return []
     return maker
+
+def draw_ten(player_hand, deck):
+    return deck.draw(10)
+
 
 #player_hand_maker
 def pocket_pair(rank_int):

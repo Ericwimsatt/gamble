@@ -19,7 +19,7 @@ class Runner:
         with ThreadPoolExecutor(max_workers=len(self.tasks)) as executor:
             future_to_meta = {}
             for task in self.tasks:
-                name = f"{task.get('player_hand', '')} // {task['strategy_name']} // {task['deads_pattern_name']}"
+                name = f"{task.get('player_hand', '')} // {task['strategy_name']} // {task.get('deads_pattern_name', '')}"
                 future = executor.submit(run_simulation, task['pre_flop_strategy'], task['post_flop_strategy'], task['river_strategy'], task.get('dead_card_maker', None), num_hands=task['hands'], player_hand_maker=task.get('player_hand_maker', None))
                 future_to_meta[future] = (name, task['hands'])
                 print(f"Submitted task: {name}")

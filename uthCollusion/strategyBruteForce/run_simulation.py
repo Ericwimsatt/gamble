@@ -34,7 +34,7 @@ def calc_blind_payout(player_rank):
 
 def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker, player_hand_maker=None):
     if not dead_card_maker:
-        dead_card_maker = lambda hand: []
+        dead_card_maker = lambda hand, deck: []
     deck = Deck()
     if player_hand_maker:
         player_hand = player_hand_maker()
@@ -42,7 +42,8 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
     else:
         player_hand = sorted(deck.draw(2))
     board = []
-    dead_cards = deck.pull_many(dead_card_maker(player_hand))
+    #destructively pull dead cards from deck
+    dead_cards = dead_card_maker(player_hand, deck)
 
     dealer_hand = deck.draw(2)
 
@@ -95,7 +96,7 @@ def play_game(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_m
         raise Exception("Invalid game state: player_rank: {}, dealer_rank: {}, ".format(player_rank, dealer_rank))
 
 
-def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=None, num_hands=1000, progress_interval=30, player_hand_maker=None):
+def run_simulation(pre_flop_strategy, post_flop_strategy, river_strategy, dead_card_maker=None, num_hands=1000, progress_interval=60, player_hand_maker=None):
     cumulative_stats = gameStats()
     clock = time()
 

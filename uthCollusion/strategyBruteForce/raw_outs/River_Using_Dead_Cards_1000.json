@@ -1,0 +1,108 @@
+{
+  "runner": "River Using Dead Cards",
+  "hands": 1000,
+  "results": {
+    " // river 17 outs // 10 random": {
+      "full": {
+        "units_won_total": -165.0,
+        "player_wins": 476,
+        "dealer_wins": 480,
+        "pushes": 44,
+        "dealer_qualifies": 834,
+        "play_bet_total": 1268,
+        "ante_bet_total": 834,
+        "player_win_play_bet_total": 772,
+        "dealer_win_play_bet_total": 451,
+        "push_play_bet_total": 45,
+        "blind_payout_total": 190.0,
+        "folds": 185,
+        "bad_folds": 13,
+        "game_count": 1000
+      },
+      "averages": {
+        "units_won_total": -0.165,
+        "player_wins": 0.476,
+        "dealer_wins": 0.48,
+        "pushes": 0.044,
+        "dealer_qualifies": 0.834,
+        "play_bet_total": 1.268,
+        "ante_bet_total": 0.834,
+        "player_win_play_bet_total": 0.772,
+        "dealer_win_play_bet_total": 0.451,
+        "push_play_bet_total": 0.045,
+        "blind_payout_total": 0.19,
+        "folds": 0.185,
+        "bad_folds": 0.013,
+        "game_count": 1.0
+      }
+    },
+    " // river 22 outs // ": {
+      "full": {
+        "units_won_total": -157.5,
+        "player_wins": 474,
+        "dealer_wins": 478,
+        "pushes": 48,
+        "dealer_qualifies": 812,
+        "play_bet_total": 1249,
+        "ante_bet_total": 812,
+        "player_win_play_bet_total": 760,
+        "dealer_win_play_bet_total": 426,
+        "push_play_bet_total": 63,
+        "blind_payout_total": 172.5,
+        "folds": 205,
+        "bad_folds": 15,
+        "game_count": 1000
+      },
+      "averages": {
+        "units_won_total": -0.1575,
+        "player_wins": 0.474,
+        "dealer_wins": 0.478,
+        "pushes": 0.048,
+        "dealer_qualifies": 0.812,
+        "play_bet_total": 1.249,
+        "ante_bet_total": 0.812,
+        "player_win_play_bet_total": 0.76,
+        "dealer_win_play_bet_total": 0.426,
+        "push_play_bet_total": 0.063,
+        "blind_payout_total": 0.1725,
+        "folds": 0.205,
+        "bad_folds": 0.015,
+        "game_count": 1.0
+      }
+    },
+    " // river 22 outs // 10 random": {
+      "full": {
+        "units_won_total": -123.0,
+        "player_wins": 498,
+        "dealer_wins": 469,
+        "pushes": 33,
+        "dealer_qualifies": 818,
+        "play_bet_total": 1373,
+        "ante_bet_total": 818,
+        "player_win_play_bet_total": 801,
+        "dealer_win_play_bet_total": 527,
+        "push_play_bet_total": 45,
+        "blind_payout_total": 188.0,
+        "folds": 80,
+        "bad_folds": 3,
+        "game_count": 1000
+      },
+      "averages": {
+        "units_won_total": -0.123,
+        "player_wins": 0.498,
+        "dealer_wins": 0.469,
+        "pushes": 0.033,
+        "dealer_qualifies": 0.818,
+        "play_bet_total": 1.373,
+        "ante_bet_total": 0.818,
+        "player_win_play_bet_total": 0.801,
+        "dealer_win_play_bet_total": 0.527,
+        "push_play_bet_total": 0.045,
+        "blind_payout_total": 0.188,
+        "folds": 0.08,
+        "bad_folds": 0.003,
+        "game_count": 1.0
+      }
+    }
+  }
+}
